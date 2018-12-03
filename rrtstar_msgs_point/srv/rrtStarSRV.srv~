@@ -1,9 +1,0 @@
-#input
-Region WS			# Working Region
-Region Goal		# Goal Region 
-geometry_msgs/Vector3 Init		# Initial Point
-Region[] Obstacles		# Vector of Obstacles
----
-# Output
-geometry_msgs/Vector3[] path		# Vector of Path points
-
