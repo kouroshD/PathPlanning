@@ -1,0 +1,1 @@
+/home/nasa/Untitled/lib/pkgconfig/rrtstar-standalone.pc

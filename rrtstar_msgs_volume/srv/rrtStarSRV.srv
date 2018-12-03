@@ -1,0 +1,8 @@
+#input
+Region WS			# Working Region
+Region Goal		# Goal Region
+Region Object		# Initial Position of the object (and its size)
+Region[] Obstacles		# Vector of Obstacles
+---
+# Output
+geometry_msgs/Vector3[] path		# Vector of Path points
