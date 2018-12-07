@@ -150,34 +150,38 @@ int main (int argc, char** argv) {
 
 
 		//! 4- Define No of obstacles
-		for (int NoObs=1; NoObs<7;NoObs++)
+		//		for (int NoObs=1; NoObs<7;NoObs++)
+		for (int NoObs=6; NoObs<7;NoObs++)
 		{
 
-
-			serviceMSG_rrt_point.request.Obstacles.clear();
-			serviceMSG_rrt_volume.request.Obstacles.clear();
-
-			if(serviceMSG_rrt_point.request.Obstacles.empty() && serviceMSG_rrt_volume.request.Obstacles.empty() )
+//			for(int obsSize=1;obsSize<6;obsSize++)
+			for(int obsSize=5;obsSize<6;obsSize++)
 			{
-				for(int obsSize=1;obsSize<6;obsSize++)
+
+
+				const char* LogPath2=((string)LogPath+"/"+to_string(counter)+"_robotSize_"+to_string(robotSize)+"_noObs_"+
+						to_string(NoObs)+"_obsSize_"+ to_string(obsSize)).c_str();
+
+				mkdir(LogPath2, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+
+
+				//! here in an iteration loop, obstacle poses are random
+				//! 6- randomly assign the obstacle positions
+				//					for(int iter=1;iter<11;iter++)
+				for(int iter=1;iter<2;iter++)
 				{
 
-
-					const char* LogPath2=((string)LogPath+"/"+to_string(counter)+"_robotSize_"+to_string(robotSize)+"_noObs_"+
-							to_string(NoObs)+"_obsSize_"+ to_string(obsSize)).c_str();
-
-					mkdir(LogPath2, S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
-
-
-					//! here in an iteration loop, obstacle poses are random
-					//! 6- randomly assign the obstacle positions
-					for(int iter=1;iter<11;iter++)
+					serviceMSG_rrt_point.request.Obstacles.clear();
+					serviceMSG_rrt_volume.request.Obstacles.clear();
+					if(serviceMSG_rrt_point.request.Obstacles.empty() && serviceMSG_rrt_volume.request.Obstacles.empty() )
 					{
+
 						double obsSizeVec[]={(double)obsSize,(double)obsSize,(double)obsSize};
 						double obsCenter[3];
 						double rootcart[]={-15.0,-15.0,-15.0};
 						double goalcenter[]={15.0,15.0,15.0};
 						double goalsize[]={2.0,2.0,2.0};
+						double goalsizefindObstacles[]={2.0+robotSize,2.0+robotSize,2.0+robotSize}; // in case the robot has a size >0, the obstacles should not go the bigger region!
 
 						ofstream ws_Info_File_point,ws_Info_File_volume;
 						ofstream traj_Info_File_point,traj_Info_File_volume;
@@ -225,7 +229,7 @@ int main (int argc, char** argv) {
 							obstacle_point.size_y= obsSize+robotSize;
 							obstacle_point.size_z= obsSize+robotSize;
 
-							randObstacleCenterGenerator (obsSizeVec, obsCenter,rootcart,goalcenter,goalsize);
+							randObstacleCenterGenerator (obsSizeVec, obsCenter,rootcart,goalcenter,goalsizefindObstacles);
 
 							obstacle_volume.center_x= obsCenter[0];
 							obstacle_volume.center_y= obsCenter[1];
@@ -295,12 +299,13 @@ int main (int argc, char** argv) {
 							}
 						}
 						traj_Info_File_volume.close();
-
 					}
-					counter++;
-					cout<<counter<<endl;
+
 				}
+				counter++;
+				cout<<counter<<endl;
 			}
+
 		}
 
 	}
@@ -353,6 +358,6 @@ void randObstacleCenterGenerator (double *obsSize, double *obsCenter,const doubl
 };
 
 void sig_handler(int sig) {
-    printf("killing process %d\n",getpid());
-    exit(0);
+	printf("killing process %d\n",getpid());
+	exit(0);
 };
