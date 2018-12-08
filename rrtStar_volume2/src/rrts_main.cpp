@@ -35,31 +35,32 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
 //! request Values:
 
 	cout<<"****************************"<<endl;
-	float x[6],y[6], z[6];
+	float x[6],y[6];
+	double  initialPose[3],robotSize[3];
 	x[0]=req.WS.center_x; 	x[1]=req.WS.center_y; 	x[2]=req.WS.center_z;
 	x[3]=req.WS.size_x; 	x[4]=req.WS.size_y; 	x[5]=req.WS.size_z;
 
 	y[0]=req.Goal.center_x; 	y[1]=req.Goal.center_y; 	y[2]=req.Goal.center_z;
-	y[3]=req.Goal.size_x; 	y[4]=req.Goal.size_y; 	y[5]=req.Goal.size_z;
+	y[3]=req.Goal.size_x; 		y[4]=req.Goal.size_y; 		y[5]=req.Goal.size_z;
 
-	z[0]=req.Object.center_x; 		z[1]=req.Object.center_y; 		z[2]=req.Object.center_z;
-	z[3]=req.Object.size_x; 		z[4]=req.Object.size_y; 		z[5]=req.Object.size_z;
+	initialPose[0]=req.Object.center_x; 		initialPose[1]=req.Object.center_y; 			initialPose[2]=req.Object.center_z;
+	robotSize[0]=req.Object.size_x; 			robotSize[1]=req.Object.size_y; 				robotSize[2]=req.Object.size_z;
 
 	cout<<"WS: "<<x[0]<<" "<<x[1]<<" "<<x[2]<<" "<<x[3]<<" "<<x[4]<<" "<<x[5]<<" " <<endl;
 	cout<<"Goal: "<<y[0]<<" "<<y[1]<<" "<<y[2]<<" "<<y[3]<<" "<<y[4]<<" "<<y[5]<<" " <<endl;
-	cout<<"Object position and size: "<<z[0]<<" "<<z[1]<<" "<<z[2]<<" "<<z[3]<<" "<<z[4]<<" "<<z[5]<<" " <<endl;
+	cout<<"robot position and size: "<<initialPose[0]<<" "<<initialPose[1]<<" "<<initialPose[2]<<" "<<robotSize[0]<<" "<<robotSize[1]<<" "<<robotSize[2]<<" " <<endl;
 
 
 	for (int i=0; i< req.Obstacles.size(); ++i){
 	      const rrtstar_msgs_volume::Region &data = req.Obstacles[i];
 	      cout<<"req.Obstacles("<<i<<")"<<data.center_x<<" "<<data.center_y<<" "<<data.center_z<<" "<<data.size_x<<" "<<data.size_y<<" "<<data.size_z<<" "<<endl;
     }
-//! extended-rrtStar Method:
-
+//! rrtStar Method:
+	cout<<"1--: "<<endl;
     planner_t rrts;
     // Create the dynamical system
     System system;
-
+    cout<<"2--: "<<endl;
     //variables:
     float gamaValue=1.5;
     int NoIteration=20000;
@@ -68,6 +69,7 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
       // Three dimensional configuration space
     system.setNumDimensions (3);
 
+    cout<<"3--: "<<endl;
       // Define the operating region
     system.regionOperating.setNumDimensions(3);
     system.regionOperating.center[0] = req.WS.center_x;
@@ -91,21 +93,26 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
     goalCenter[1]=system.regionGoal.center[1];
     goalCenter[2]=system.regionGoal.center[2];
 
+    cout<<"3--: "<<endl;
+  	// Setup the root vertex
 
-	//double obstacleCenter[3];
-    double rootCartPos[3]={z[0],z[1],z[2]};
-    double rootCartSize[3] = {z[3],z[4],z[5]};
-
-    system.setRootState(rootCartPos, rootCartSize);
+      // Add the system to the planner
     rrts.setSystem (system);
+    cout<<"4--: "<<endl;
+      // Set up the root vertex
+    vertex_t &root = rrts.getRootVertex();
+    State &rootState = root.getState();
 
-    // Set up the root vertex
-//    vertex_t &root = rrts.getRootVertex();
-//	State &rootState = root.getState();
-//	rootState[0] = z[0]; //check later
-//	rootState[1] = z[1];
-//	rootState[2] = z[2];
+    system.setRootState(3,initialPose,robotSize);
+    cout<<"5--: "<<endl;
+//    rootState.x[0] = initialPose[0]; //check later
+//    rootState.x[1] = initialPose[1];
+//    rootState.x[2] = initialPose[2];
 
+    for(int i=0;i<3;i++)
+    	cout<< rootState.x[i]<<", "<< rootState.y[i]<<";; ";
+    cout<<endl;
+    cout<<"6--: "<<endl;
     // Define the obstacle region
     if (system.obstacles.size()>0)
     	system.obstacles.clear();
@@ -124,15 +131,20 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
 	    system.obstacles.push_front (obstacle);  // Add the obstacle to the list
 	}
 
-
+	cout<<"7--: "<<endl;
       // Initialize the planner
     rrts.initialize ();
+    srand(time(0));
 
       // This parameter should be larger than 1.5 for asymptotic
       //   rather than exploration in the RRT* algorithm. Lower
       //   optimality. Larger values will weigh on optimization
       //   values, such as 0.1, should recover the RRT.
     rrts.setGamma (gamaValue);
+    cout<<"8--: "<<endl;
+    for(int i=0;i<3;i++)
+    	cout<< rootState.x[i]<<", "<< rootState.y[i]<<";; ";
+    cout<<endl;
 
     clock_t start = clock();
     // Run the algorithm for 10000 iteartions
@@ -148,10 +160,10 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
 
     //! add init state to returning path
 //    if (stateList.size()>0){
-        pathState.x=rootCartPos[0];//rootState[0] ;
-        pathState.y=rootCartPos[1];//rootState[1];
+        pathState.x=rootState[0] ;
+        pathState.y=rootState[1];
         if (system.getNumDimensions() > 2)
-        	pathState.z=rootCartPos[2];//rootState[2];
+        	pathState.z=rootState[2];
         else
         	pathState.z=0.0;
         res.path.push_back(pathState);
@@ -182,6 +194,8 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
 	res.path.push_back(pathState);
 
 
+
+
 	cout<<"way points:"<<endl;
 	for(int i=0;i<res.path.size();i++)
 	{
@@ -200,6 +214,7 @@ bool generatePath(rrtstar_msgs_volume::rrtStarSRV::Request &req, rrtstar_msgs_vo
 //		obstacle.size_z=pitt_call.objectFeature[i][5];
 //		res..push_back(obstacle);
 //	}
+
 //	char stringTime[20];
 
 //	sprintf(stringTime, "%f", ((double)(start))/CLOCKS_PER_SEC);
@@ -221,7 +236,6 @@ int main (int argc, char** argv) {
 	ros::NodeHandle nh;
 	ros::ServiceServer service = nh.advertiseService("rrtStar_volume_Service",generatePath);
 
-	srand(time(0));
     cout << "*****************" << endl;
     cout << "RRTstar is alive: " << endl;
 

@@ -62,7 +62,7 @@ bool generatePath(rrtstar_msgs_point::rrtStarSRV::Request &req, rrtstar_msgs_poi
 
     //variables:
     float gamaValue=1.5;
-    int NoIteration=50000;
+    int NoIteration=20000;
     geometry_msgs::Vector3 pathState;
 
       // Three dimensional configuration space

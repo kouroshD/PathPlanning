@@ -93,7 +93,8 @@ int main (int argc, char** argv) {
 	//
 	//    }
 
-	for (int robotSize=0; robotSize<5;robotSize++)
+	for (int robotSize=6; robotSize<7;robotSize++)
+//	for (int robotSize=0; robotSize<5;robotSize++)
 	{
 		//! 1- Define the Msg types
 		rrtstar_msgs_point::rrtStarSRV  serviceMSG_rrt_point;
@@ -176,12 +177,12 @@ int main (int argc, char** argv) {
 					if(serviceMSG_rrt_point.request.Obstacles.empty() && serviceMSG_rrt_volume.request.Obstacles.empty() )
 					{
 
-						double obsSizeVec[]={(double)obsSize,(double)obsSize,(double)obsSize};
+						double obsSizeVec[]={(double)obsSize+robotSize,(double)obsSize+robotSize,(double)obsSize+robotSize};
 						double obsCenter[3];
 						double rootcart[]={-15.0,-15.0,-15.0};
 						double goalcenter[]={15.0,15.0,15.0};
 						double goalsize[]={2.0,2.0,2.0};
-						double goalsizefindObstacles[]={2.0+robotSize,2.0+robotSize,2.0+robotSize}; // in case the robot has a size >0, the obstacles should not go the bigger region!
+//						double goalsizefindObstacles[]={2.0+robotSize,2.0+robotSize,2.0+robotSize}; // in case the robot has a size >0, the obstacles should not go the bigger region!
 
 						ofstream ws_Info_File_point,ws_Info_File_volume;
 						ofstream traj_Info_File_point,traj_Info_File_volume;
@@ -229,7 +230,7 @@ int main (int argc, char** argv) {
 							obstacle_point.size_y= obsSize+robotSize;
 							obstacle_point.size_z= obsSize+robotSize;
 
-							randObstacleCenterGenerator (obsSizeVec, obsCenter,rootcart,goalcenter,goalsizefindObstacles);
+							randObstacleCenterGenerator (obsSizeVec, obsCenter,rootcart,goalcenter,goalsize);
 
 							obstacle_volume.center_x= obsCenter[0];
 							obstacle_volume.center_y= obsCenter[1];
