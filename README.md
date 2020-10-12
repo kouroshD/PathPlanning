@@ -9,13 +9,11 @@ This repository contains the following pkgs:
  
  - S. Karaman, E. Frazzoli, "Sampling-based algorithms for optimal motion planning", The International Journal of Robotics Research, 30(7), 846–894. [link](https://journals.sagepub.com/doi/abs/10.1177/0278364911406761#articleCitationDownloadContainer)
 
-- My thesis, which explains the advantages of extended-rrt* wrt rrt*.
 
-Extended-rrt* computes a feasible path for an object/robot with a volume in the workspace, while rrt* computes the path for a point in space. For further details, please check the mentioned thesis, or write to me.
+Extended-rrt* computes a feasible path for an object/robot with a volume in the workspace, while rrt* computes the path for a point in space.
 
-This library is distributed in the hope that it will be useful but WITHOUT ANY WARRANTY, including the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. The authors allow the users of the PathPlanning library to use and modify it for their own research. Any commercial application, redistribution, etc... has to be arranged between users and authors individually.
 
-For further license information, please contact the author.
+For further information, please contact:
 
 kourosh.darvish@gmail.com
 
